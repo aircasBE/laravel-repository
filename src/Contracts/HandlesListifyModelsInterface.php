@@ -9,7 +9,7 @@ interface HandlesListifyModelsInterface
      *
      * @param  int $id
      * @param  int $newPosition default: top spot
-     * @return boolean
+     * @return bool
      */
-    public function updatePosition($id, $newPosition = 1);
+    public function updatePosition(int $id, int $newPosition = 1): bool;
 }

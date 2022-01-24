@@ -1,8 +1,8 @@
 <?php
 
 namespace Czim\Repository\Contracts;
-use Illuminate\Database\Eloquent\Model;
 
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * The point of this is to provide Eloquent saving through some

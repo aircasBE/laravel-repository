@@ -60,11 +60,7 @@ interface BaseRepositoryInterface
      */
     public function firstOrFail($columns = ['*']);
 
-    /**
-     * @param array $columns
-     * @return mixed
-     */
-    public function all($columns = ['*']);
+    public function all(array $columns = ['*']): mixed;
 
     /**
      * @param  string $value
@@ -137,19 +133,13 @@ interface BaseRepositoryInterface
 
     /**
      * Makes a new model without persisting it
-     *
-     * @param  array $data
-     * @return Model
      */
-    public function make(array $data);
+    public function make(array $data): Model;
 
     /**
      * Creates a model and returns it
-     *
-     * @param array $data
-     * @return Model|null
      */
-    public function create(array $data);
+    public function create(array $data): ?Model;
 
     /**
      * Updates a model by $id

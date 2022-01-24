@@ -38,15 +38,12 @@ interface PostProcessingRepositoryInterface
      * @param array|Closure|null $parameters
      * @return $this
      */
-    public function pushPostProcessor($class, $parameters = null);
+    public function pushPostProcessor(string $class, array|Closure|null $parameters = null);
 
     /**
      * Removes postProcessor
-     *
-     * @param string $class
-     * @return $this
      */
-    public function removePostProcessor($class);
+    public function removePostProcessor(string $class): self;
 
     /**
      * Runs the result for retrieval calls to the repository

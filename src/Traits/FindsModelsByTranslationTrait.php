@@ -32,7 +32,7 @@ trait FindsModelsByTranslationTrait
      */
     public function findAllByTranslation($attribute, $value, $locale = null, $exact = true)
     {
-        $this->pushCriteriaOnce( new WhereHasTranslation($attribute, $value, $locale, $exact) );
+        $this->pushCriteriaOnce(new WhereHasTranslation($attribute, $value, $locale, $exact));
 
         return $this->all();
     }

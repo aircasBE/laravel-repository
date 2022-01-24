@@ -67,7 +67,7 @@ abstract class ExtendedPostProcessingRepository extends ExtendedRepository imple
      *
      * @return Collection|PostProcessorInterface[]
      */
-    public function defaultPostProcessors()
+    public function defaultPostProcessors(): Collection|PostProcessorInterface|array
     {
         return new Collection([
             ApplyExtraHiddenAndVisibleAttributes::class => function () {
@@ -83,10 +83,8 @@ abstract class ExtendedPostProcessingRepository extends ExtendedRepository imple
 
     /**
      * Restores prostprocessors to default collection
-     *
-     * @return $this
      */
-    public function restoreDefaultPostProcessors()
+    public function restoreDefaultPostProcessors(): self
     {
         $this->postProcessors = $this->defaultPostProcessors();
 
@@ -95,12 +93,8 @@ abstract class ExtendedPostProcessingRepository extends ExtendedRepository imple
 
     /**
      * Pushes a postProcessor to apply to all models retrieved
-     *
-     * @param string             $class
-     * @param array|Closure|null $parameters
-     * @return $this
      */
-    public function pushPostProcessor($class, $parameters = null)
+    public function pushPostProcessor(string $class, array|Closure|null $parameters = null): self
     {
         $this->postProcessors->put($class, $parameters);
 
@@ -109,11 +103,8 @@ abstract class ExtendedPostProcessingRepository extends ExtendedRepository imple
 
     /**
      * Removes postProcessor
-     *
-     * @param string $class
-     * @return $this
      */
-    public function removePostProcessor($class)
+    public function removePostProcessor(string $class): self
     {
         $this->postProcessors->forget($class);
 
@@ -130,9 +121,7 @@ abstract class ExtendedPostProcessingRepository extends ExtendedRepository imple
     public function postProcess($result)
     {
         // determine whether there is anything to process
-        if (    is_null($result)
-            ||  is_a($result, Collection::class) && $result->isEmpty()
-        ) {
+        if (is_null($result) || is_a($result, Collection::class) && $result->isEmpty()) {
             return $result;
         }
 
@@ -185,12 +174,7 @@ abstract class ExtendedPostProcessingRepository extends ExtendedRepository imple
         return $model;
     }
 
-    /**
-     * @param string $processor
-     * @param mixed  $parameters flexible parameter input can be string, array or closure that generates either
-     * @return PostProcessorInterface
-     */
-    protected function makePostProcessor($processor, $parameters = null)
+    protected function makePostProcessor(string $processor, mixed $parameters = null): PostProcessorInterface
     {
         // no parameters? simple make
         if (is_null($parameters)) {

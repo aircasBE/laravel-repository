@@ -16,10 +16,10 @@ trait HandlesEloquentRelationManipulationTrait
      * @param  Model $model
      * @param  string   $relation name of the relation (method name)
      * @param  array    $ids      list of id's to connect to
-     * @param bool      $detaching
+     * @param  bool      $detaching
      * @return
      */
-    public function sync(Model $model, $relation, $ids, $detaching = true)
+    public function sync(Model $model, string $relation, array $ids, bool $detaching = true)
     {
         return $model->{$relation}()->sync($ids, $detaching);
     }
