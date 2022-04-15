@@ -1,4 +1,5 @@
 <?php
+
 namespace Czim\Repository\Criteria\Common;
 
 use Czim\Repository\Criteria\AbstractCriteria;
@@ -20,9 +21,8 @@ class OrderBy extends AbstractCriteria
      */
     public function __construct($columnOrArray, $direction = self::DEFAULT_DIRECTION)
     {
-        if ( ! is_array($columnOrArray)) {
-            $columnOrArray = [ $columnOrArray => $direction ];
-
+        if (!is_array($columnOrArray)) {
+            $columnOrArray = [$columnOrArray => $direction];
         } else {
             // make sure it is a proper array
 
@@ -58,5 +58,4 @@ class OrderBy extends AbstractCriteria
 
         return $model;
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace Czim\Repository\Test\Helpers;
 
 use Czim\Repository\Criteria\NullCriteria;
@@ -16,10 +17,10 @@ class TestExtendedRepository extends ExtendedRepository
         FindsModelsByTranslationTrait;
 
     // model needs an active check by default
-    protected $hasActive = true;
+    protected bool $hasActive = true;
 
     // test assumes cache is enabled by default
-    protected $enableCache = true;
+    protected bool $enableCache = true;
 
 
     public function model()
@@ -35,5 +36,3 @@ class TestExtendedRepository extends ExtendedRepository
         ]);
     }
 }
-
-

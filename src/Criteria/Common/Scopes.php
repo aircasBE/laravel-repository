@@ -1,4 +1,5 @@
 <?php
+
 namespace Czim\Repository\Criteria\Common;
 
 use Czim\Repository\Criteria\AbstractCriteria;
@@ -34,36 +35,34 @@ class Scopes extends AbstractCriteria
             // normalize each scopeset to: [ name, [ parameters ] ]
 
             // if a key is given, $scopeSet = parameters (and must be made an array)
-            if ( ! is_numeric($scopeName)) {
+            if (!is_numeric($scopeName)) {
 
-                if ( ! is_array($scopeSet)) {
-                    $scopeSet = [ $scopeSet ];
+                if (!is_array($scopeSet)) {
+                    $scopeSet = [$scopeSet];
                 }
 
-                $scopeSet = [ $scopeName, $scopeSet ];
-
+                $scopeSet = [$scopeName, $scopeSet];
             } else {
                 // $scopeName is not set, so the $scopeSet must contain at least the scope name
                 // allow strings to be passed, assuming no parameters
 
-                if ( ! is_array($scopeSet)) {
-                    $scopeSet = [ $scopeSet, [] ];
+                if (!is_array($scopeSet)) {
+                    $scopeSet = [$scopeSet, []];
                 }
             }
 
             // problems if the first param is not a string
-            if ( ! is_string(Arr::get($scopeSet, '0'))) {
+            if (!is_string(Arr::get($scopeSet, '0'))) {
                 throw new \Exception("First parameter of scopeset must be a string (the scope name)!");
             }
 
             // make sure second parameter is an array
-            if ( ! isset($scopeSet[1]) || empty($scopeSet[1])) {
+            if (!isset($scopeSet[1]) || empty($scopeSet[1])) {
 
                 $scopeSet[1] = [];
+            } elseif (!is_array($scopeSet[1])) {
 
-            } elseif ( ! is_array($scopeSet[1])) {
-
-                $scopeSet[1] = [ $scopeSet[1] ];
+                $scopeSet[1] = [$scopeSet[1]];
             }
         }
 
@@ -79,8 +78,7 @@ class Scopes extends AbstractCriteria
     protected function applyToQuery($model)
     {
         foreach ($this->scopes as $scopeSet) {
-
-            $model = call_user_func_array([ $model, $scopeSet[0] ], $scopeSet[1]);
+            $model = call_user_func_array([$model, $scopeSet[0]], $scopeSet[1]);
         }
 
         return $model;

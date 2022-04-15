@@ -10,7 +10,7 @@ use Watson\Rememberable\Rememberable;
  */
 class UseCache extends AbstractCriteria
 {
-    const CACHE_DEFAULT_TTL = 15;
+    public const CACHE_DEFAULT_TTL = 15;
 
     /**
      * @var int|null

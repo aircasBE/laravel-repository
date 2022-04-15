@@ -2,54 +2,29 @@
 namespace Czim\Repository\Criteria\Translatable;
 
 use Czim\Repository\Criteria\AbstractCriteria;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 
 class WhereHasTranslation extends AbstractCriteria
 {
     /**
-     * @var string
+     * If the $exact variable is false ir will look up the translation as an 'LIKE' with the '%' added
      */
-    protected $locale;
+    public function __construct(
+        protected string $attribute,
+        protected string $value,
+        protected ?string $locale = null,
+        protected bool $exact = true
+    ) {
+        if (empty($locale)) {
+            $locale = app()->getLocale();
+        }
 
-    /**
-     * @var string
-     */
-    protected $attribute;
-
-    /**
-     * @var string
-     */
-    protected $value;
-
-    /**
-     * @var bool
-     */
-    protected $exact;
-
-    /**
-     * @var string
-     */
-    protected $operator;
-
-
-    /**
-     * @param string $attribute
-     * @param string $value
-     * @param string $locale
-     * @param bool   $exact     if false, looks up as 'like' (adds %)
-     */
-    public function __construct($attribute, $value, $locale = null, $exact = true)
-    {
-        if (empty($locale)) $locale = app()->getLocale();
-
-        if ( ! $exact && ! preg_match('#^%(.+)%$#', $value)) {
+        if (! $exact && !preg_match('#^%(.+)%$#', $value)) {
             $value = '%' . $value . '%';
         }
 
-        $this->locale    = $locale;
-        $this->attribute = $attribute;
-        $this->value     = $value;
-        $this->operator  = $exact ? '=' : 'LIKE';
+        $this->operator  = $this->exact ? '=' : 'LIKE';
     }
 
 
@@ -59,13 +34,9 @@ class WhereHasTranslation extends AbstractCriteria
      */
     protected function applyToQuery($model)
     {
-        return $model->whereHas(
-            'translations',
-            function (EloquentBuilder $query) {
-
-                return $query->where($this->attribute, $this->operator, $this->value)
-                             ->where('locale', $this->locale);
-            }
-        );
+        return $model->whereHas('translations', function (EloquentBuilder $query): Builder {
+            return $query->where($this->attribute, $this->operator, $this->value)
+                ->where('locale', $this->locale);
+        });
     }
 }

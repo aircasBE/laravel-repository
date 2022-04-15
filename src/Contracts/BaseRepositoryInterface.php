@@ -13,12 +13,9 @@ interface BaseRepositoryInterface
 {
     /**
      * Returns specified model class name.
-     *
      * Note that this is the only abstract method.
-     *
-     * @return string
      */
-    public function model();
+    public function model(): string;
 
     /**
      * Creates instance of model to start building query for
@@ -31,40 +28,34 @@ interface BaseRepositoryInterface
 
     /**
      * Give unexecuted query for current criteria
-     *
-     * @return EloquentBuilder
      */
-    public function query();
+    public function query(): EloquentBuilder;
 
     /**
      * Does a simple count(*) for the model / scope
-     *
-     * @return int
      */
-    public function count();
+    public function count(): int;
 
     /**
-     * Returns first match
-     *
-     * @param array $columns
-     * @return Model|null
+     * Execute the query and get the first result.
      */
-    public function first($columns = ['*']);
+    public function first(array $columns = ['*']): ?Model;
 
     /**
      * Returns first match or throws exception if not found
      *
-     * @param array $columns
+     * @param  array $columns
      * @return Model
+     *
      * @throws ModelNotFoundException
      */
-    public function firstOrFail($columns = ['*']);
+    public function firstOrFail(array $columns = ['*']);
 
     /**
      * @param array $columns
      * @return mixed
      */
-    public function all($columns = ['*']);
+    public function all(array $columns = ['*']);
 
     /**
      * @param  string $value
@@ -99,14 +90,11 @@ interface BaseRepositoryInterface
     public function find($id, $columns = ['*'], $attribute = null);
 
     /**
-     * Returns first match or throws exception if not found
+     * Find a model by its primary key or throw an exception.
      *
-     * @param  int|string $id
-     * @param  array      $columns
-     * @return Model
      * @throws ModelNotFoundException
      */
-    public function findOrFail($id, $columns = ['*']);
+    public function findOrFail(int|string $id, array $columns = ['*']): Model;
 
     /**
      * @param string $attribute
@@ -269,26 +257,19 @@ interface BaseRepositoryInterface
      *                                        empty for normal automatic numeric key
      * @return $this
      */
-    public function pushCriteria(CriteriaInterface $criteria, $key = null);
+    public function pushCriteria(CriteriaInterface $criteria, ?string $key = null): self;
 
     /**
      * Removes criteria by key, if it exists
-     *
-     * @param string $key
-     * @return $this
      */
-    public function removeCriteria($key);
+    public function removeCriteria(string $key): self;
 
     /**
      * Pushes Criteria, but only for the next call, resets to default afterwards
      * Note that this does NOT work for specific criteria exclusively, it resets
      * to default for ALL Criteria.
-     *
-     * @param CriteriaInterface $criteria
-     * @param string|null       $key
-     * @return $this
      */
-    public function pushCriteriaOnce(CriteriaInterface $criteria, $key = null);
+    public function pushCriteriaOnce(CriteriaInterface $criteria, ?string $key = null): self;
 
     /**
      * Removes Criteria, but only for the next call, resets to default afterwards

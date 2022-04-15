@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Czim\Repository;
 
 use Czim\Repository\Contracts\BaseRepositoryInterface;
@@ -116,7 +118,7 @@ abstract class BaseRepository implements BaseRepositoryInterface
     {
         $model = $this->app->make($this->model());
 
-        if ( ! $model instanceof Model) {
+        if (!$model instanceof Model) {
             throw new RepositoryException("Class {$this->model()} must be an instance of Illuminate\\Database\\Eloquent\\Model");
         }
 
@@ -157,12 +159,9 @@ abstract class BaseRepository implements BaseRepositoryInterface
     }
 
     /**
-     * Returns first match
-     *
-     * @param  array $columns
-     * @return Model|null
+     * Returns first match.
      */
-    public function first($columns = ['*'])
+    public function first($columns = ['*']): ?Model
     {
         return $this->query()->first($columns);
     }
@@ -170,24 +169,20 @@ abstract class BaseRepository implements BaseRepositoryInterface
     /**
      * Returns first match or throws exception if not found
      *
-     * @param  array $columns
-     * @return Model
      * @throws ModelNotFoundException
      */
-    public function firstOrFail($columns = ['*'])
+    public function firstOrFail(array $columns = ['*']): Model
     {
         $result = $this->query()->first($columns);
 
-        if ( ! empty($result)) return $result;
+        if (!empty($result)) {
+            return $result;
+        }
 
-        throw (new ModelNotFoundException)->setModel($this->model());
+        throw (new ModelNotFoundException())->setModel($this->model());
     }
 
-    /**
-     * @param  array $columns
-     * @return mixed
-     */
-    public function all($columns = ['*'])
+    public function all(array $columns = ['*']): array
     {
         return $this->query()->get($columns);
     }
@@ -231,7 +226,7 @@ abstract class BaseRepository implements BaseRepositoryInterface
         $perPage = $perPage ?: $this->getDefaultPerPage();
 
         return $this->query()
-                    ->paginate($perPage, $columns, $pageName, $page);
+            ->paginate($perPage, $columns, $pageName, $page);
     }
 
     /**
@@ -263,7 +258,7 @@ abstract class BaseRepository implements BaseRepositoryInterface
     {
         $result = $this->query()->find($id, $columns);
 
-        if ( ! empty($result)) return $result;
+        if (!empty($result)) return $result;
 
         throw (new ModelNotFoundException)->setModel($this->model(), $id);
     }
@@ -277,8 +272,8 @@ abstract class BaseRepository implements BaseRepositoryInterface
     public function findBy($attribute, $value, $columns = ['*'])
     {
         return $this->query()
-                    ->where($attribute, $value)
-                    ->first($columns);
+            ->where($attribute, $value)
+            ->first($columns);
     }
 
     /**
@@ -290,8 +285,8 @@ abstract class BaseRepository implements BaseRepositoryInterface
     public function findAllBy($attribute, $value, $columns = ['*'])
     {
         return $this->query()
-                    ->where($attribute, $value)
-                    ->get($columns);
+            ->where($attribute, $value)
+            ->get($columns);
     }
 
     /**
@@ -310,31 +305,28 @@ abstract class BaseRepository implements BaseRepositoryInterface
 
             if ($value instanceof Closure) {
 
-                $model = ( ! $or)
+                $model = (!$or)
                     ? $model->where($value)
                     : $model->orWhere($value);
-
             } elseif (is_array($value)) {
 
                 if (count($value) === 3) {
 
                     list($field, $operator, $search) = $value;
 
-                    $model = ( ! $or)
+                    $model = (!$or)
                         ? $model->where($field, $operator, $search)
                         : $model->orWhere($field, $operator, $search);
-
                 } elseif (count($value) === 2) {
 
                     list($field, $search) = $value;
 
-                    $model = ( ! $or)
+                    $model = (!$or)
                         ? $model->where($field, $search)
                         : $model->orWhere($field, $search);
                 }
-
             } else {
-                $model = ( ! $or)
+                $model = (!$or)
                     ? $model->where($field, $value)
                     : $model->orWhere($field, $value);
             }
@@ -436,7 +428,7 @@ abstract class BaseRepository implements BaseRepositoryInterface
     public function allCallback(Closure $callback, $columns = ['*'])
     {
         /** @var EloquentBuilder $result */
-        $result = $callback( $this->query() );
+        $result = $callback($this->query());
 
         $this->checkValidCustomCallback($result);
 
@@ -455,7 +447,7 @@ abstract class BaseRepository implements BaseRepositoryInterface
     public function findCallback(Closure $callback, $columns = ['*'])
     {
         /** @var EloquentBuilder $result */
-        $result = $callback( $this->query() );
+        $result = $callback($this->query());
 
         $this->checkValidCustomCallback($result);
 
@@ -468,9 +460,10 @@ abstract class BaseRepository implements BaseRepositoryInterface
      */
     protected function checkValidCustomCallback($result)
     {
-        if (    ! is_a($result, Model::class)
-            &&  ! is_a($result, EloquentBuilder::class)
-            &&  ! is_a($result, DatabaseBuilder::class)
+        if (
+            !is_a($result, Model::class)
+            &&  !is_a($result, EloquentBuilder::class)
+            &&  !is_a($result, DatabaseBuilder::class)
         ) {
             throw new InvalidArgumentException('Incorrect allCustom call in repository. The callback must return a QueryBuilder/EloquentBuilder or Model object.');
         }
@@ -584,7 +577,7 @@ abstract class BaseRepository implements BaseRepositoryInterface
         $criteriaToApply = $this->getCriteria();
 
         // overrule them with criteria to be applied once
-        if ( ! $this->onceCriteria->isEmpty()) {
+        if (!$this->onceCriteria->isEmpty()) {
 
             foreach ($this->onceCriteria as $onceKey => $onceCriteria) {
 
@@ -625,26 +618,25 @@ abstract class BaseRepository implements BaseRepositoryInterface
         if ($this->ignoreCriteria === true) {
 
             // and make sure that they are re-applied when we stop ignoring
-            if ( ! $this->activeCriteria->isEmpty()) {
+            if (!$this->activeCriteria->isEmpty()) {
                 $this->makeModel();
                 $this->activeCriteria = new Collection();
             }
+
             return $this;
         }
 
-        if ($this->areActiveCriteriaUnchanged()) return $this;
+        if ($this->areActiveCriteriaUnchanged()) {
+            return $this;
+        }
 
         // if the new Criteria are different, clear the model and apply the new Criteria
         $this->makeModel();
-
         $this->markAppliedCriteriaAsActive();
-
 
         // apply the collected criteria to the query
         foreach ($this->getCriteriaToApply() as $criteria) {
-
             if ($criteria instanceof CriteriaInterface) {
-
                 $this->model = $criteria->apply($this->model, $this);
             }
         }
@@ -657,21 +649,17 @@ abstract class BaseRepository implements BaseRepositoryInterface
     /**
      * Checks whether the criteria that are currently pushed
      * are the same as the ones that were previously applied
-     *
-     * @return bool
      */
-    protected function areActiveCriteriaUnchanged()
+    protected function areActiveCriteriaUnchanged(): bool
     {
-        return (    $this->onceCriteria->isEmpty()
-                &&  $this->criteria == $this->activeCriteria
-                );
+        return $this->onceCriteria->isEmpty() && $this->criteria == $this->activeCriteria;
     }
 
     /**
-     * Marks the active criteria so we can later check what
+     * Marks the active criteria, so we can later check what
      * is currently active
      */
-    protected function markAppliedCriteriaAsActive()
+    protected function markAppliedCriteriaAsActive(): void
     {
         $this->activeCriteria = $this->getCriteriaToApply();
     }
@@ -679,30 +667,18 @@ abstract class BaseRepository implements BaseRepositoryInterface
     /**
      * After applying, removes the criteria that should only have applied once
      */
-    protected function clearOnceCriteria()
+    protected function clearOnceCriteria(): void
     {
-        if ( ! $this->onceCriteria->isEmpty()) {
+        if (!$this->onceCriteria->isEmpty()) {
             $this->onceCriteria = new Collection();
         }
     }
 
-    /**
-     * Pushes Criteria, optionally by identifying key
-     * If a criteria already exists for the key, it is overridden
-     *
-     * Note that this does NOT overrule any onceCriteria, even if set by key!
-     *
-     * @param  CriteriaInterface $criteria
-     * @param  string|null       $key       unique identifier to store criteria as
-     *                                      this may be used to remove and overwrite criteria
-     *                                      empty for normal automatic numeric key
-     * @return $this
-     */
-    public function pushCriteria(CriteriaInterface $criteria, $key = null)
+    /** {@inheritDoc} */
+    public function pushCriteria(CriteriaInterface $criteria, ?string $key = null): self
     {
         // standard bosnadev behavior
         if (is_null($key)) {
-
             $this->criteria->push($criteria);
             return $this;
         }
@@ -713,13 +689,8 @@ abstract class BaseRepository implements BaseRepositoryInterface
         return $this;
     }
 
-    /**
-     * Removes criteria by key, if it exists
-     *
-     * @param string $key
-     * @return $this
-     */
-    public function removeCriteria($key)
+    /** {@inheritDoc} */
+    public function removeCriteria(string $key): self
     {
         $this->criteria->forget($key);
 
@@ -735,7 +706,7 @@ abstract class BaseRepository implements BaseRepositoryInterface
      * @param  string|null       $key
      * @return $this
      */
-    public function pushCriteriaOnce(CriteriaInterface $criteria, $key = null)
+    public function pushCriteriaOnce(CriteriaInterface $criteria, ?string $key = null): self
     {
         if (is_null($key)) {
 
@@ -764,7 +735,9 @@ abstract class BaseRepository implements BaseRepositoryInterface
     public function removeCriteriaOnce($key)
     {
         // if not present in normal list, there is nothing to override
-        if ( ! $this->criteria->has($key)) return $this;
+        if (!$this->criteria->has($key)) {
+            return $this;
+        }
 
         // override by key with Null-value
         $this->onceCriteria->put($key, new NullCriteria);

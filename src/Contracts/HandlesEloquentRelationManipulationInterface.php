@@ -1,4 +1,5 @@
 <?php
+
 namespace Czim\Repository\Contracts;
 
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +12,7 @@ interface HandlesEloquentRelationManipulationInterface
      * @param  Model  $model
      * @param  string $relation name of the relation (method name)
      * @param  array  $ids      list of id's to connect to
-     * @param bool    $detaching
+     * @param  bool    $detaching
      * @return
      */
     public function sync(Model $model, $relation, $ids, $detaching = true);
@@ -23,9 +24,9 @@ interface HandlesEloquentRelationManipulationInterface
      * @param  string  $relation name of the relation (method name)
      * @param  int     $id
      * @param  array   $attributes
-     * @param  boolean $touch
+     * @param  bool
      */
-    public function attach(Model $model, $relation, $id, array $attributes = array(), $touch = true);
+    public function attach(Model $model, string $relation, int $id, array $attributes = [], bool $touch = true);
 
     /**
      * Executes a detach on the model provided
@@ -35,9 +36,10 @@ interface HandlesEloquentRelationManipulationInterface
      * @param  array   $ids
      * @param  boolean $touch
      * @return
+     * 
      * @internal param array $attributes
      */
-    public function detach(Model $model, $relation, $ids = array(), $touch = true);
+    public function detach(Model $model, string $relation, array $ids = [], bool $touch = true);
 
     /**
      * Excecutes an associate on the model model provided
@@ -47,7 +49,7 @@ interface HandlesEloquentRelationManipulationInterface
      * @param  mixed  $with
      * @return boolean
      */
-    public function associate(Model $model, $relation, $with);
+    public function associate(Model $model, string $relation, mixed $with);
 
     /**
      * Excecutes a dissociate on the model model provided
@@ -57,5 +59,5 @@ interface HandlesEloquentRelationManipulationInterface
      * @param  mixed  $from
      * @return boolean
      */
-    public function dissociate(Model $model, $relation, $from);
+    public function dissociate(Model $model, string $relation, mixed $from);
 }

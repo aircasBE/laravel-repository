@@ -1,4 +1,5 @@
 <?php
+
 namespace Czim\Repository\PostProcessors;
 
 use Czim\Repository\Contracts\PostProcessorInterface;
@@ -6,30 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class ApplyExtraHiddenAndVisibleAttributes implements PostProcessorInterface
 {
-
-    /**
-     * List of fields to make sure are hidden on the model
-     *
-     * @var array
-     */
-    protected $hidden;
-
-    /**
-     * List of fields to make sure are visible on the model
-     *
-     * @var array
-     */
-    protected $unhidden;
-
-
-    /**
-     * @param array $hidden
-     * @param array $unhidden
-     */
-    public function __construct(array $hidden, array $unhidden)
-    {
-        $this->hidden = $hidden;
-        $this->unhidden = $unhidden;
+    public function __construct(
+        protected array $hidden,    // List of fields to make sure are hidden on the model.
+        protected array $unhidden   // List of fields to make sure are visible on the model.
+    ) {
     }
 
     /**
@@ -43,10 +24,8 @@ class ApplyExtraHiddenAndVisibleAttributes implements PostProcessorInterface
         $hiddenOnModel = $model->getHidden();
 
         foreach ($this->unhidden as $unhidden) {
-
             if (($key = array_search($unhidden, $hiddenOnModel)) !== false) {
-
-                unset($hiddenOnModel[ $key ]);
+                unset($hiddenOnModel[$key]);
             }
         }
 

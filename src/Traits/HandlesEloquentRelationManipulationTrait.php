@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Czim\Repository\Traits;
 
 use Illuminate\Database\Eloquent\Model;
@@ -12,28 +15,22 @@ trait HandlesEloquentRelationManipulationTrait
 {
     /**
      * Executes a sync on the model provided
-     *
-     * @param  Model $model
-     * @param  string   $relation name of the relation (method name)
-     * @param  array    $ids      list of id's to connect to
-     * @param bool      $detaching
-     * @return
      */
-    public function sync(Model $model, $relation, $ids, $detaching = true)
+    public function sync(Model $model, string $relation, array $identifiers, bool $detaching = true): array
     {
-        return $model->{$relation}()->sync($ids, $detaching);
+        return $model->{$relation}()->sync($identifiers, $detaching);
     }
 
     /**
-     * Executes an attach on the model provided
+     * Executes an attachment on the model provided
      *
-     * @param  Model $model
-     * @param  string   $relation name of the relation (method name)
+     * @param  Model    $model
+     * @param  string   $relation       name of the relation (method name)
      * @param  int      $id
      * @param  array    $attributes
-     * @param  boolean  $touch
+     * @param  bool     $touch
      */
-    public function attach(Model $model, $relation, $id, array $attributes = array(), $touch = true)
+    public function attach(Model $model, string $relation, int $id, array $attributes = [], bool $touch = true)
     {
         return $model->{$relation}()->attach($id, $attributes, $touch);
     }
@@ -41,10 +38,10 @@ trait HandlesEloquentRelationManipulationTrait
     /**
      * Executes a detach on the model provided
      *
-     * @param  Model $model
+     * @param  Model    $model
      * @param  string   $relation name of the relation (method name)
      * @param  array    $ids
-     * @param  boolean  $touch
+     * @param  bool     $touch
      * @return
      * @internal param array $attributes
      */
@@ -54,29 +51,18 @@ trait HandlesEloquentRelationManipulationTrait
     }
 
     /**
-     * Excecutes an associate on the model model provided
-     *
-     * @param  Model $model
-     * @param  string   $relation name of the relation (method name)
-     * @param  mixed    $with
-     * @return boolean
+     * Execution method for associating the model instance to its given parent.
      */
-    public function associate(Model $model, $relation, $with)
+    public function associate(Model $model, string $relation, mixed $with): bool
     {
         return $model->{$relation}()->associate($with);
     }
 
     /**
-     * Excecutes a dissociate on the model model provided
-     *
-     * @param  Model $model
-     * @param  string   $relation name of the relation (method name)
-     * @param  mixed    $from
-     * @return boolean
+     * Executes a dissociated on the model provided
      */
-    public function dissociate(Model $model, $relation, $from)
+    public function dissociate(Model $model, string $relation, mixed $from): bool
     {
         return $model->{$relation}()->dissociate($from);
     }
-
 }

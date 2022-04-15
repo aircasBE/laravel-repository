@@ -1,4 +1,5 @@
 <?php
+
 namespace Czim\Repository\Criteria\Common;
 
 use Czim\Repository\Criteria\AbstractCriteria;
@@ -10,7 +11,6 @@ class Custom extends AbstractCriteria
      * @var callable $query
      */
     protected $query;
-
 
     public function __construct(callable $query)
     {
@@ -27,5 +27,4 @@ class Custom extends AbstractCriteria
 
         return $callable($model);
     }
-
 }

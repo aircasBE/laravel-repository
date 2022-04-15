@@ -1,18 +1,22 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Czim\Repository\Traits;
 
 use Czim\Listify\Contracts\ListifyInterface;
+use Czim\Repository\Exceptions\RepositoryException;
+use InvalidArgumentException;
 
 trait HandlesListifyModelsTrait
 {
     /**
      * Updates the position for a record using Listify
+     * The default position for the $nowPosition variable is 'top spot'.
      *
-     * @param  int $id
-     * @param  int $newPosition     default: top spot
-     * @return boolean
+     * @throws RepositoryException
      */
-    public function updatePosition($id, $newPosition = 1)
+    public function updatePosition(int $id, int $newPosition = 1): mixed
     {
         $model = $this->makeModel(false);
 
@@ -23,7 +27,7 @@ trait HandlesListifyModelsTrait
         $this->checkModelHasListify($model);
 
         /** @var ListifyInterface $model */
-        $model->setListPosition( (int) $newPosition );
+        $model->setListPosition($newPosition);
 
         return $model;
     }
@@ -39,8 +43,8 @@ trait HandlesListifyModelsTrait
         // with Listify by default, check only for the methods used here
         // ( ! is_a($model, ListifyInterface::class))
 
-        if ( ! method_exists($model, 'setListPosition')) {
-            throw new \InvalidArgumentException('Method can only be used on Models with the Listify trait');
+        if (! method_exists($model, 'setListPosition')) {
+            throw new InvalidArgumentException('Method can only be used on Models with the Listify trait');
         }
     }
 }

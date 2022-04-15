@@ -10,7 +10,7 @@ use Illuminate\Support\Collection;
 interface PostProcessingRepositoryInterface
 {
     /**
-     * Returns the default list of postprocessors to apply to models
+     * Returns the default list of postprocessors to apply to model
      * before returning the result to anything using the repository.
      *
      * Each entry is combination of a key (the classname of the postprocessor)
@@ -25,11 +25,9 @@ interface PostProcessingRepositoryInterface
     public function defaultPostProcessors();
 
     /**
-     * Restores prostprocessors to default collection
-     *
-     * @return $this
+     * Restores postprocessors to default collection
      */
-    public function restoreDefaultPostProcessors();
+    public function restoreDefaultPostProcessors(): self;
 
     /**
      * Pushes a postProcessor to apply to all models retrieved
@@ -66,7 +64,7 @@ interface PostProcessingRepositoryInterface
      * @param  string $attribute name of the attribute to unhide
      * @return $this
      */
-    public function unhideAttribute($attribute);
+    public function unhideAttribute(string $attribute): self;
 
     /**
      * @param array|Arrayable $attributes

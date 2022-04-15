@@ -19,49 +19,35 @@ abstract class ExtendedRepository extends BaseRepository implements ExtendedRepo
 {
     /**
      * Override if model has a basic 'active' field
-     *
-     * @var bool
      */
-    protected $hasActive = false;
+    protected bool $hasActive = false;
 
     /**
      * The column to check for if hasActive is true
-     *
-     * @var string
      */
-    protected $activeColumn = 'active';
+    protected string $activeColumn = 'active';
 
     /**
      * Setting: enables (remember) cache
-     *
-     * @var bool
      */
-    protected $enableCache = false;
+    protected bool $enableCache = false;
 
     /**
      * Setting: disables the active=1 check (if hasActive is true for repo)
-     *
-     * @var bool
      */
-    protected $includeInactive = false;
+    protected bool $includeInactive = false;
 
     /**
      * Scopes to apply to queries
      * Must be supported by model used!
-     *
-     * @var array
      */
-    protected $scopes = [];
+    protected array $scopes = [];
 
     /**
      * Parameters for a given scope.
      * Note that you can only use each scope once, since parameters will be set by scope name as key.
-     *
-     * @var array
      */
-    protected $scopeParameters = [];
-
-
+    protected array $scopeParameters = [];
 
     /**
      * @param Container  $app
@@ -106,8 +92,8 @@ abstract class ExtendedRepository extends BaseRepository implements ExtendedRepo
     public function refreshSettingDependentCriteria()
     {
         if ($this->hasActive) {
-            if ( ! $this->includeInactive) {
-                $this->criteria->put(CriteriaKey::ACTIVE, new Criteria\Common\IsActive( $this->activeColumn ));
+            if (!$this->includeInactive) {
+                $this->criteria->put(CriteriaKey::ACTIVE, new Criteria\Common\IsActive($this->activeColumn));
             } else {
                 $this->criteria->forget(CriteriaKey::ACTIVE);
             }
@@ -119,7 +105,7 @@ abstract class ExtendedRepository extends BaseRepository implements ExtendedRepo
             $this->criteria->forget(CriteriaKey::CACHE);
         }
 
-        if ( ! empty($this->scopes)) {
+        if (!empty($this->scopes)) {
             $this->criteria->put(CriteriaKey::SCOPE, $this->getScopesCriteriaInstance());
         } else {
             $this->criteria->forget(CriteriaKey::SCOPE);
@@ -148,7 +134,7 @@ abstract class ExtendedRepository extends BaseRepository implements ExtendedRepo
      */
     protected function getScopesCriteriaInstance()
     {
-        return new Criteria\Common\Scopes( $this->convertScopesToCriteriaArray() );
+        return new Criteria\Common\Scopes($this->convertScopesToCriteriaArray());
     }
 
 
@@ -165,12 +151,12 @@ abstract class ExtendedRepository extends BaseRepository implements ExtendedRepo
      */
     public function addScope($scope, $parameters = [])
     {
-        if ( ! in_array($scope, $this->scopes)) {
+        if (!in_array($scope, $this->scopes)) {
 
             $this->scopes[] = $scope;
         }
 
-        $this->scopeParameters[ $scope ] = $parameters;
+        $this->scopeParameters[$scope] = $parameters;
 
         $this->refreshSettingDependentCriteria();
         return $this;
@@ -184,9 +170,9 @@ abstract class ExtendedRepository extends BaseRepository implements ExtendedRepo
      */
     public function removeScope($scope)
     {
-        $this->scopes = array_diff($this->scopes, [ $scope ]);
+        $this->scopes = array_diff($this->scopes, [$scope]);
 
-        unset($this->scopeParameters[ $scope ]);
+        unset($this->scopeParameters[$scope]);
 
         $this->refreshSettingDependentCriteria();
         return $this;
@@ -217,13 +203,13 @@ abstract class ExtendedRepository extends BaseRepository implements ExtendedRepo
 
         foreach ($this->scopes as $scope) {
 
-            if (array_key_exists($scope, $this->scopeParameters) && ! empty($this->scopeParameters[ $scope ])) {
+            if (array_key_exists($scope, $this->scopeParameters) && !empty($this->scopeParameters[$scope])) {
 
-                $scopes[] = [ $scope, $this->scopeParameters[ $scope ] ];
+                $scopes[] = [$scope, $this->scopeParameters[$scope]];
                 continue;
             }
 
-            $scopes[] = [ $scope, [] ];
+            $scopes[] = [$scope, []];
         }
 
         return $scopes;
@@ -244,7 +230,7 @@ abstract class ExtendedRepository extends BaseRepository implements ExtendedRepo
     public function maintenance($enable = true)
     {
         return $this->includeInactive($enable)
-                    ->enableCache( ! $enable);
+            ->enableCache(!$enable);
     }
 
     /**
@@ -332,11 +318,11 @@ abstract class ExtendedRepository extends BaseRepository implements ExtendedRepo
      */
     public function activateRecord($id, $active = true)
     {
-        if ( ! $this->hasActive) return false;
+        if (!$this->hasActive) return false;
 
         $model = $this->makeModel(false);
 
-        if ( ! ($model = $model->find($id))) return false;
+        if (!($model = $model->find($id))) return false;
 
         $model->{$this->activeColumn} = (bool) $active;
 

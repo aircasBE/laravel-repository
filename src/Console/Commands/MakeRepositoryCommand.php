@@ -1,49 +1,32 @@
 <?php
+
 namespace Czim\Repository\Console\Commands;
 
 use Czim\Repository\BaseRepository;
 use Czim\Repository\RepositoryServiceProvider;
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputArgument;
 
 class MakeRepositoryCommand extends GeneratorCommand
 {
-
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $name = 'make:repository';
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $description = 'Create a new Eloquent model repository class';
 
-    /**
-     * @var string
-     */
-    protected $namespace = 'App\\Repositories';
+    protected string $namespace = 'App\\Repositories';
 
-    /**
-     * @var string
-     */
-    protected $base = BaseRepository::class;
+    protected string $base = BaseRepository::class;
 
-    /**
-     * @var string
-     */
-    protected $suffix = 'Repository';
+    protected string $suffix = 'Repository';
 
-    /**
-     * @var string
-     */
-    protected $models = 'App';
+    protected string $models = 'App';
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $type = 'Repository';
 
 
@@ -61,7 +44,7 @@ class MakeRepositoryCommand extends GeneratorCommand
     /**
      * Load the configuration for the command.
      */
-    protected function loadConfig()
+    protected function loadConfig(): void
     {
         $this->namespace = config('repository.generate.namespace', $this->namespace);
         $this->base      = config('repository.generate.base', $this->base);
@@ -74,7 +57,7 @@ class MakeRepositoryCommand extends GeneratorCommand
      *
      * @return string
      */
-    protected function getStub()
+    protected function getStub(): string
     {
         return RepositoryServiceProvider::$packagePath . '/stubs/repository.stub';
     }
@@ -85,40 +68,34 @@ class MakeRepositoryCommand extends GeneratorCommand
      * @param  string $rootNamespace
      * @return string
      */
-    public function getDefaultNamespace($rootNamespace)
+    public function getDefaultNamespace($rootNamespace): string
     {
         return $this->namespace;
     }
 
     /**
      * Build the class with the given name.
-     *
-     * @param string $name
-     * @return string
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+
+     * @throws FileNotFoundException
      */
-    protected function buildClass($name)
+    protected function buildClass($name): string
     {
         $stub = parent::buildClass($name);
 
         $modelName = $this->getModelClass($name);
 
         $this->replaceModelNamespace($stub, $modelName)
-             ->replaceModelClass($stub, $modelName)
-             ->replaceBaseRepositoryNamespace($stub, $this->base)
-             ->replaceBaseRepositoryClass($stub, $this->base);
+            ->replaceModelClass($stub, $modelName)
+            ->replaceBaseRepositoryNamespace($stub, $this->base)
+            ->replaceBaseRepositoryClass($stub, $this->base);
 
         return $stub;
     }
 
     /**
      * Replace the probable namespace for the given stub.
-     *
-     * @param  string $stub
-     * @param  string $name
-     * @return $this
      */
-    protected function replaceModelNamespace(&$stub, $name)
+    protected function replaceModelNamespace(string &$stub, string $name): self
     {
         $stub = str_replace('DummyModelNamespace', $name, $stub);
 
@@ -127,12 +104,8 @@ class MakeRepositoryCommand extends GeneratorCommand
 
     /**
      * Replace the probable model class name for the given stub.
-     *
-     * @param  string $stub
-     * @param  string $name
-     * @return $this
      */
-    protected function replaceModelClass(&$stub, $name)
+    protected function replaceModelClass(string &$stub, string $name): self
     {
         $names = explode('\\', $name);
         $class = array_pop($names);
@@ -144,26 +117,22 @@ class MakeRepositoryCommand extends GeneratorCommand
 
     /**
      * Get the class name of the probable associated model.
-     *
-     * @param $name
-     * @return string
      */
-    protected function getModelClass($name)
+    protected function getModelClass(string $name): string
     {
         $modelClass = $this->getModelNameInput();
 
         // Generate the model class from the repository class name if not explicitly set
-        if ( ! $modelClass) {
-
+        if (!$modelClass) {
             $repositoryClass = str_replace($this->getNamespace($name) . '\\', '', $name);
             $class           = str_replace($this->suffix, '', $repositoryClass);
 
             $modelClass = Str::singular($class);
         }
 
-        // Append the expected models namespace if not namespaced yet
-        if (false === strpos($modelClass, '\\')) {
-            $modelClass = "{$this->models}\\{$modelClass}";
+        // Append the expected model namespace if not namespaced yet
+        if (!str_contains($modelClass, '\\')) {
+            $modelClass = $this->models . '\\' . $modelClass;
         }
 
         return $modelClass;
@@ -171,12 +140,8 @@ class MakeRepositoryCommand extends GeneratorCommand
 
     /**
      * Replace the default base repository class namespace for the given stub.
-     *
-     * @param  string $stub
-     * @param  string $name
-     * @return $this
      */
-    protected function replaceBaseRepositoryNamespace(&$stub, $name)
+    protected function replaceBaseRepositoryNamespace(string &$stub, string $name): self
     {
         $stub = str_replace('BaseRepositoryNamespace', $name, $stub);
 
@@ -185,12 +150,8 @@ class MakeRepositoryCommand extends GeneratorCommand
 
     /**
      * Replace the default base repository class name for the given stub.
-     *
-     * @param  string $stub
-     * @param  string $name
-     * @return $this
      */
-    protected function replaceBaseRepositoryClass(&$stub, $name)
+    protected function replaceBaseRepositoryClass(string &$stub, string $name): self
     {
         $baseClass = str_replace($this->getNamespace($name) . '\\', '', $name);
         $stub      = str_replace('BaseRepositoryClass', $baseClass, $stub);
@@ -200,25 +161,20 @@ class MakeRepositoryCommand extends GeneratorCommand
 
     /**
      * Get the desired model class name from the input.
-     *
-     * @return string
      */
-    protected function getModelNameInput()
+    protected function getModelNameInput(): string
     {
         return trim($this->argument('model'));
     }
 
     /**
      * Get the console command arguments.
-     *
-     * @return array
      */
-    protected function getArguments()
+    protected function getArguments(): array
     {
         return [
             ['name', InputArgument::REQUIRED, 'The name of the repository class'],
             ['model', InputArgument::OPTIONAL, 'The name of the model class'],
         ];
     }
-
 }

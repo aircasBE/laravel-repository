@@ -1,4 +1,5 @@
 <?php
+
 namespace Czim\Repository\Criteria\Common;
 
 use Czim\Repository\Criteria\AbstractCriteria;
@@ -6,19 +7,10 @@ use Illuminate\Database\Eloquent\Builder;
 
 class WithRelations extends AbstractCriteria
 {
-    /**
-     * @var array
-     */
-    protected $withStatements = [];
-
-    /**
-     * @param array $withStatements
-     */
-    public function __construct(array $withStatements)
-    {
-        $this->withStatements = $withStatements;
+    public function __construct(
+        protected array $withStatements = []
+    ) {
     }
-
 
     /**
      * @param Builder $model
@@ -28,5 +20,4 @@ class WithRelations extends AbstractCriteria
     {
         return $model->with($this->withStatements);
     }
-
 }

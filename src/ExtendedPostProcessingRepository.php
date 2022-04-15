@@ -22,25 +22,14 @@ use ReflectionClass;
  */
 abstract class ExtendedPostProcessingRepository extends ExtendedRepository implements PostProcessingRepositoryInterface
 {
-    /**
-     * @var string[]
-     */
-    protected $extraHidden = [];
-
-    /**
-     * @var string[]
-     */
-    protected $extraUnhidden = [];
+    protected string|array $extraHidden = [];
+    protected string|array $extraUnhidden = [];
 
     /**
      * The postprocessors to apply to the returned results for the repository
      * (only all() and find(), and similar calls)
-     *
-     * @var Collection
      */
-    protected $postProcessors;
-
-
+    protected Collection $postProcessors;
 
     /**
      * @param App                            $app
@@ -70,9 +59,7 @@ abstract class ExtendedPostProcessingRepository extends ExtendedRepository imple
     public function defaultPostProcessors()
     {
         return new Collection([
-            ApplyExtraHiddenAndVisibleAttributes::class => function () {
-                return [$this->extraHidden, $this->extraUnhidden];
-            },
+            ApplyExtraHiddenAndVisibleAttributes::class => fn () => [$this->extraHidden, $this->extraUnhidden]
         ]);
     }
 
@@ -81,12 +68,8 @@ abstract class ExtendedPostProcessingRepository extends ExtendedRepository imple
     //      PostProcessors
     // -------------------------------------------------------------------------
 
-    /**
-     * Restores prostprocessors to default collection
-     *
-     * @return $this
-     */
-    public function restoreDefaultPostProcessors()
+    /** {@inheritDoc} */
+    public function restoreDefaultPostProcessors(): self
     {
         $this->postProcessors = $this->defaultPostProcessors();
 
@@ -130,9 +113,7 @@ abstract class ExtendedPostProcessingRepository extends ExtendedRepository imple
     public function postProcess($result)
     {
         // determine whether there is anything to process
-        if (    is_null($result)
-            ||  is_a($result, Collection::class) && $result->isEmpty()
-        ) {
+        if (is_null($result) || is_a($result, Collection::class) && $result->isEmpty()) {
             return $result;
         }
 
@@ -190,7 +171,7 @@ abstract class ExtendedPostProcessingRepository extends ExtendedRepository imple
      * @param mixed  $parameters flexible parameter input can be string, array or closure that generates either
      * @return PostProcessorInterface
      */
-    protected function makePostProcessor($processor, $parameters = null)
+    protected function makePostProcessor(string $processor, mixed $parameters = null): PostProcessorInterface
     {
         // no parameters? simple make
         if (is_null($parameters)) {
@@ -228,19 +209,10 @@ abstract class ExtendedPostProcessingRepository extends ExtendedRepository imple
     //      Attribute hiding
     // -------------------------------------------------------------------------
 
-    /**
-     * Unhide an otherwise hidden attribute (in $hidden array)
-     *
-     * Note that these count on only the model's 'hidden' array to be set,
-     * if a model whitelists with visible, it won't work as expected
-     *
-     * @param  string $attribute name of the attribute to unhide
-     * @return $this
-     */
-    public function unhideAttribute($attribute)
+    /** {@inheritDoc} */
+    public function unhideAttribute(string $attribute): self
     {
-        if ( ! in_array($attribute, $this->extraUnhidden)) {
-
+        if (! in_array($attribute, $this->extraUnhidden)) {
             $this->extraUnhidden[] = $attribute;
         }
 
@@ -324,9 +296,8 @@ abstract class ExtendedPostProcessingRepository extends ExtendedRepository imple
      * Override
      *
      * @param array $columns
-     * @return Model|null
      */
-    public function first($columns = ['*'])
+    public function first($columns = ['*']): ?Model
     {
         return $this->postProcess( parent::first($columns) );
     }
